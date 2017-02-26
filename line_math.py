@@ -4,11 +4,12 @@ from typing import Sequence
 Line = namedtuple("Line", "x1 y1 x2 y2")
 
 
-def average_of_lines(lines: Sequence[Line]) -> Line:
-    """ Returns the avg of a sequence of lines. Rounds float points down to the nearest int. """
+def average_of_lines(lines: Sequence[Line]) -> Sequence[Line]:
+    """ Returns the avg of a sequence of lines. Rounds float points down to the nearest int.
+     Returns an empty list if there are no lines present."""
 
     n_lines = len(lines)
-    if n_lines < 1:
+    if n_lines < 2:
         return lines
 
     avg_x1 = int(sum(line.x1 for line in lines) / n_lines)
@@ -16,7 +17,7 @@ def average_of_lines(lines: Sequence[Line]) -> Line:
     avg_x2 = int(sum(line.x2 for line in lines) / n_lines)
     avg_y2 = int(sum(line.y2 for line in lines) / n_lines)
 
-    return Line(avg_x1, avg_y1, avg_x2, avg_y2)
+    return [Line(avg_x1, avg_y1, avg_x2, avg_y2)]
 
 
 def intercept(line: Line) -> float:
