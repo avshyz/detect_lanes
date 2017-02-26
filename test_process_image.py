@@ -4,7 +4,7 @@ from typing import Sequence
 import matplotlib.image as mpimg
 import numpy as np
 
-from detect_lanes import process_image
+from detect_lanes import process_image, find_lines
 from pytest import fixture
 
 
@@ -36,3 +36,15 @@ def test_can_process_image_without_crashing(image: np.ndarray):
 def test_can_process_all_examples_without_crashing(images: Sequence[np.ndarray]):
     for image in images:
         process_image(image)
+
+
+def test_we_arent_getting_region_of_interest_lines(image):
+    assert len(find_lines(image)) == 4
+
+
+def test_has_lane_lines_for_third_image(images):
+    """ Were not getting lane lines on the third image! Let's find out why. """
+
+    third_image = images[2]
+    lines = find_lines(third_image)
+    assert len(lines) > 0

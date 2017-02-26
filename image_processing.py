@@ -1,4 +1,4 @@
-from typing import Sequence
+from typing import Sequence, Tuple
 
 import cv2
 import numpy as np
@@ -29,13 +29,10 @@ def gaussian_blur(img: np.ndarray, kernel_size: int) -> np.ndarray:
     return cv2.GaussianBlur(img, (kernel_size, kernel_size), 0)
 
 
-def region_of_interest(img, vertices):
-    """
-    Applies an image mask.
+def region_of_interest(img: np.ndarray, vertices: Sequence[np.array]) -> np.ndarray:
+    """ Applies an image mask. Everything outside of the region defined by vertices will be set to black.
+    Vertices should be in the form Sequence[np.array[Tuple[int, int]]] but we can't document this with mypy. """
 
-    Only keeps the region of the image defined by the polygon
-    formed from `vertices`. The rest of the image is set to black.
-    """
     # defining a blank mask to start with
     mask = np.zeros_like(img)
 
@@ -47,6 +44,8 @@ def region_of_interest(img, vertices):
         ignore_mask_color = 255
 
     # filling pixels inside the polygon defined by "vertices" with the fill color
+    # Vertices is a list containing an np.array of vertices. This is not obvious.
+    # It needs to look like: [np.array(vertex1, vertex2, vertex3)]
     cv2.fillPoly(mask, vertices, ignore_mask_color)
 
     # returning the image only where mask pixels are nonzero
@@ -54,7 +53,7 @@ def region_of_interest(img, vertices):
     return masked_image
 
 
-def hough_lines(img, rho, theta, threshold, min_line_len, max_line_gap):
+def hough_lines(img, rho, theta, threshold, min_line_len, max_line_gap) -> Sequence[Line]:
     """
     `img` should be the output of a Canny transform.
 
@@ -65,11 +64,7 @@ def hough_lines(img, rho, theta, threshold, min_line_len, max_line_gap):
 
     # Use our tuple object to make line calculations friendlier
     # A line is given to use in the format [[x1,y1,x2,y2]]
-    lines = [Line(*line[0]) for line in lines]
-
-    line_img = np.zeros((img.shape[0], img.shape[1], 3), dtype=np.uint8)
-    draw_lines(line_img, lines)
-    return line_img
+    return [Line(*line[0]) for line in lines]
 
 
 def draw_lines(img, lines: Sequence[Line], color=(255, 0, 0), thickness=10):
@@ -89,21 +84,37 @@ def draw_lines(img, lines: Sequence[Line], color=(255, 0, 0), thickness=10):
     If you want to make the lines semi-transparent, think about combining
     this function with the weighted_img() function below
     """
+    lines = reduce_to_lanes(lines)
+    # lines = filter_too_horizontal(lines)
+    height = img.shape[0]
+    bottom = height
+    # top = min(line.y1 for line in lanes) + 30
+    top = 350
+
+    for line in lines:
+        extr = extrapolate(line, bottom, top)
+        cv2.line(img, (extr.x1, extr.y1), (extr.x2, extr.y2), color, thickness)
+
+
+def reduce_to_lanes(lines: Sequence[Line]) -> Sequence[Line]:
+    # filter lines that are too high to be lane lines
+    MIN_ACCEPTABLE_Y_POSITION = 400
+    lines = [line for line in lines if line.y1 > MIN_ACCEPTABLE_Y_POSITION or line.y2 > MIN_ACCEPTABLE_Y_POSITION]
+
+    # lines = filter_too_horizontal(lines)
 
     left_lanes = [line for line in lines if slope(line) > 0]
     right_lanes = [line for line in lines if slope(line) < 0]
-
     left_avg = average_of_lines(left_lanes)
     right_avg = average_of_lines(right_lanes)
-    averages = left_avg + right_avg
+    return left_avg + right_avg
 
-    height = img.shape[0]
-    bottom = height
-    top = min(line.y1 for line in left_lanes + right_lanes)
+def filter_too_horizontal(lines: Sequence[Line]) -> Sequence[Line]:
+    slope_magnitudes = (np.abs(slope(line)) for line in lines)
+    lane_slope = np.mean(reversed(sorted(slope_magnitudes))[:2])
 
-    for line in averages:
-        extr = extrapolate(line, bottom, top)
-        cv2.line(img, (extr.x1, extr.y1), (extr.x2, extr.y2), color, thickness)
+    return [line for line in lines if np.abs(slope(line)) > 0.9*lane_slope]
+    # pass
 
 
 def weighted_img(img, initial_img, α=0.8, β=1., λ=0.):
@@ -119,3 +130,9 @@ def weighted_img(img, initial_img, α=0.8, β=1., λ=0.):
     NOTE: initial_img and img must be the same shape!
     """
     return cv2.addWeighted(initial_img, α, img, β, λ)
+
+
+def make_lines_image(lines: Sequence[Line], height, width):
+    line_img = np.zeros((height, width, 3), dtype=np.uint8)
+    draw_lines(line_img, lines)
+    return line_img
