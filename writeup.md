@@ -22,34 +22,34 @@ The goals / steps of this project are the following:
 ###1. Describe your pipeline. As part of the description, explain how you modified the draw_lines() function.
 
 * convert the image to grayscale, so it's easier to detect contrast without having to worry about different colors.
-[gray][gray]
+![gray][gray]
 
 * Set pixels outside a specified region black: This allows us to use domain knowledge to detect only lines that will likely be related to lane markings.
 
-[region of interest][region of interest]
+![region of interest][region of interest]
 
 * apply gaussian blur: to reduce noise the in the image, so we don't predict a bunch of tiny edges that don't exist.
 
-[blurred][blurred]
+![blurred][blurred]
 
 * apply canny transform: This will look at the gradient of each pixel of the image (how different each pixel is to its neighbors).
   It will then select pixels with an intensity above a certain threshold to be edges. Pixels adjacent to high threshold pixels
   that are still above a lower threshold will be included as well. This converts the image to **line world!**
 
-[canny][canny]
+![canny][canny]
 
 * Convert to hough space: try to draw lines between our images using the HoughLinePFunction
 * heuristically remove lines that seem unlikely to be lane lines
   * too high up in the image
   * if we think the are the edged of our area of interest
 
-[lines][lines]
+![lines][lines]
 
 * Split lines between left and right lanes and average each group.
 
 Merge the two images back together:
 
-[final][final]
+![final][final]
 
 My pipeline consisted of 5 steps. First, I converted the images to grayscale, then I .... 
 
