@@ -89,7 +89,7 @@ def draw_lines(img, lines: Sequence[Line], color=(255, 0, 0), thickness=10):
     height = img.shape[0]
     bottom = height
     # top = min(line.y1 for line in lanes) + 30
-    top = 350
+    top = 320
 
     for line in lines:
         extr = extrapolate(line, bottom, top)
