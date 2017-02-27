@@ -23,9 +23,7 @@ def canny(img, low_threshold, high_threshold):
 
 
 def gaussian_blur(img: np.ndarray, kernel_size: int) -> np.ndarray:
-    """Applies a Gaussian Noise kernel.
-    :param img:
-    :param kernel_size: must be an odd int """
+    """Applies a Gaussian Noise kernel. kernel_size: must be an odd int """
     return cv2.GaussianBlur(img, (kernel_size, kernel_size), 0)
 
 
@@ -101,6 +99,9 @@ def reduce_to_lanes(lines: Sequence[Line]) -> Sequence[Line]:
     MIN_ACCEPTABLE_Y_POSITION = 400
     lines = [line for line in lines if line.y1 > MIN_ACCEPTABLE_Y_POSITION or line.y2 > MIN_ACCEPTABLE_Y_POSITION]
 
+    MIN_SLOPE = .4
+    # Let's get rid of horizontal lines.
+    lines = [line for line in lines if np.abs(slope(line)) > MIN_SLOPE]
     # lines = filter_too_horizontal(lines)
 
     left_lanes = [line for line in lines if slope(line) > 0]
@@ -109,11 +110,12 @@ def reduce_to_lanes(lines: Sequence[Line]) -> Sequence[Line]:
     right_avg = average_of_lines(right_lanes)
     return left_avg + right_avg
 
+
 def filter_too_horizontal(lines: Sequence[Line]) -> Sequence[Line]:
     slope_magnitudes = (np.abs(slope(line)) for line in lines)
     lane_slope = np.mean(reversed(sorted(slope_magnitudes))[:2])
 
-    return [line for line in lines if np.abs(slope(line)) > 0.9*lane_slope]
+    return [line for line in lines if np.abs(slope(line)) > 0.9 * lane_slope]
     # pass
 
 
