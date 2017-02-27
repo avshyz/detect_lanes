@@ -97,9 +97,9 @@ def draw_lines(img, lines: Sequence[Line], color=(255, 0, 0), thickness=10):
 def reduce_to_lanes(lines: Sequence[Line]) -> Sequence[Line]:
     # filter lines that are too high to be lane lines
     MIN_ACCEPTABLE_Y_POSITION = 400
-    lines = [line for line in lines if line.y1 > MIN_ACCEPTABLE_Y_POSITION or line.y2 > MIN_ACCEPTABLE_Y_POSITION]
-
     MIN_SLOPE = .4
+
+    lines = [line for line in lines if line.y1 > MIN_ACCEPTABLE_Y_POSITION or line.y2 > MIN_ACCEPTABLE_Y_POSITION]
     # Let's get rid of horizontal lines.
     lines = [line for line in lines if np.abs(slope(line)) > MIN_SLOPE]
     # lines = filter_too_horizontal(lines)
