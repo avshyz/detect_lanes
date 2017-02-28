@@ -1,11 +1,11 @@
 from typing import Sequence
 
-import numpy as np
 import cv2
+import numpy as np
 
 from image_processing import grayscale, region_of_interest, gaussian_blur, canny, hough_lines, weighted_img, \
     make_lines_image
-from line_math import Line
+from line_math import Line, average_of_lines, slope, extrapolate
 
 RHO = 2
 THETA = np.pi / 180
@@ -20,19 +20,25 @@ GAUSSIAN_BLUR_KERNEL_SIZE = 3
 LOW_CANNY_THRESHOLD = 200
 HIGH_CANNY_THRESHOLD = 300
 
+MIN_ACCEPTABLE_Y_POSITION = 400
+MIN_SLOPE = .4
+
+LANE_TOP_Y_POSITION = 320
+
 EXAMPLES_DIR = "./examples/"
+
 
 def process_image(image: np.ndarray) -> np.ndarray:
     first_img = np.copy(image)
     height, width, _ = first_img.shape
 
     lines = find_lines(first_img)
-    lines_img = make_lines_image(lines, height, width)
-    # write_image(EXAMPLES_DIR + "lines.jpg", lines_img)
+    lanes = reduce_to_lanes(lines)
 
-    # Just for testing so we can see where the region of interest is.
-    # vertices = region_of_interest_vertices(height, width)
-    # slightly_smaller_vertices = vertices_just_inside(vertices)
+    # draw from the bottom of the image to near the horizon
+    lanes = [extrapolate(lane, height, LANE_TOP_Y_POSITION) for lane in lanes]
+
+    lines_img = make_lines_image(lanes, height, width)
     # first_img = region_of_interest(first_img, [slightly_smaller_vertices])
     return weighted_img(lines_img, first_img, .9)
 
@@ -54,6 +60,22 @@ def find_lines(image: np.ndarray) -> Sequence[Line]:
     cropped_canny = region_of_interest(canny_img, [slightly_smaller_vertices])
 
     return hough_lines(cropped_canny, RHO, THETA, HOUGH_LINE_THRESHOLD, MIN_LINE_LEN, MAX_LINE_GAP)
+
+
+def reduce_to_lanes(lines: Sequence[Line]) -> Sequence[Line]:
+    """ Heuristically reduce a list of lines to what we believe are lanes. """
+
+    # filter lines that are too high to be lane lines
+    lines = [line for line in lines if line.y1 > MIN_ACCEPTABLE_Y_POSITION or line.y2 > MIN_ACCEPTABLE_Y_POSITION]
+
+    # Let's get rid of horizontal lines.
+    lines = [line for line in lines if np.abs(slope(line)) > MIN_SLOPE]
+
+    left_lanes = [line for line in lines if slope(line) > 0]
+    right_lanes = [line for line in lines if slope(line) < 0]
+    left_avg = average_of_lines(left_lanes)
+    right_avg = average_of_lines(right_lanes)
+    return left_avg + right_avg
 
 
 def region_of_interest_vertices(height: int, width: int) -> np.array:

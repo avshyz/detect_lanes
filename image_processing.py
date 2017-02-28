@@ -1,9 +1,9 @@
-from typing import Sequence, Tuple
+from typing import Sequence
 
 import cv2
 import numpy as np
 
-from line_math import average_of_lines, extrapolate, slope, Line
+from line_math import Line
 
 
 def grayscale(img: np.ndarray):
@@ -65,60 +65,6 @@ def hough_lines(img, rho, theta, threshold, min_line_len, max_line_gap) -> Seque
     return [Line(*line[0]) for line in lines]
 
 
-def draw_lines(img, lines: Sequence[Line], color=(255, 0, 0), thickness=10):
-    """
-    NOTE: this is the function you might want to use as a starting point once you want to
-    average/extrapolate the line segments you detect to map out the full
-    extent of the lane (going from the result shown in raw-lines-example.mp4
-    to that shown in P1_example.mp4).
-
-    Think about things like separating line segments by their
-    slope ((y2-y1)/(x2-x1)) to decide which segments are part of the left
-    line vs. the right line.  Then, you can average the position of each of
-    the lines and extrapolate to the top and bottom of the lane.
-
-    This function draws `lines` with `color` and `thickness`.
-    Lines are drawn on the image inplace (mutates the image).
-    If you want to make the lines semi-transparent, think about combining
-    this function with the weighted_img() function below
-    """
-    lines = reduce_to_lanes(lines)
-    # lines = filter_too_horizontal(lines)
-    height = img.shape[0]
-    bottom = height
-    # top = min(line.y1 for line in lanes) + 30
-    top = 320
-
-    for line in lines:
-        extr = extrapolate(line, bottom, top)
-        cv2.line(img, (extr.x1, extr.y1), (extr.x2, extr.y2), color, thickness)
-
-
-def reduce_to_lanes(lines: Sequence[Line]) -> Sequence[Line]:
-    # filter lines that are too high to be lane lines
-    MIN_ACCEPTABLE_Y_POSITION = 400
-    MIN_SLOPE = .4
-
-    lines = [line for line in lines if line.y1 > MIN_ACCEPTABLE_Y_POSITION or line.y2 > MIN_ACCEPTABLE_Y_POSITION]
-    # Let's get rid of horizontal lines.
-    lines = [line for line in lines if np.abs(slope(line)) > MIN_SLOPE]
-    # lines = filter_too_horizontal(lines)
-
-    left_lanes = [line for line in lines if slope(line) > 0]
-    right_lanes = [line for line in lines if slope(line) < 0]
-    left_avg = average_of_lines(left_lanes)
-    right_avg = average_of_lines(right_lanes)
-    return left_avg + right_avg
-
-
-def filter_too_horizontal(lines: Sequence[Line]) -> Sequence[Line]:
-    slope_magnitudes = (np.abs(slope(line)) for line in lines)
-    lane_slope = np.mean(reversed(sorted(slope_magnitudes))[:2])
-
-    return [line for line in lines if np.abs(slope(line)) > 0.9 * lane_slope]
-    # pass
-
-
 def weighted_img(img, initial_img, α=0.8, β=1., λ=0.):
     """
     `img` is the output of the hough_lines(), An image with lines drawn on it.
@@ -134,7 +80,17 @@ def weighted_img(img, initial_img, α=0.8, β=1., λ=0.):
     return cv2.addWeighted(initial_img, α, img, β, λ)
 
 
-def make_lines_image(lines: Sequence[Line], height, width):
+def make_lines_image(lines: Sequence[Line], height, width, color=(255, 0, 0), thickness=10):
+    """
+    Draw lines on a black image with size height and width.
+
+    :param lines: Indicates positions to draw on return image
+    :param height: of the return image
+    :param width: of the return image
+    :param color: of lines
+    :param thickness: of lines
+    """
     line_img = np.zeros((height, width, 3), dtype=np.uint8)
-    draw_lines(line_img, lines)
+    for line in lines:
+        cv2.line(line_img, (line.x1, line.y1), (line.x2, line.y2), color, thickness)
     return line_img
