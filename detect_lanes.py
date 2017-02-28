@@ -5,6 +5,7 @@ import numpy as np
 
 from image_processing import grayscale, region_of_interest, gaussian_blur, canny, hough_lines, weighted_img, \
     make_lines_image
+
 from line_math import Line, average_of_lines, slope, extrapolate
 
 RHO = 2
@@ -28,12 +29,13 @@ LANE_TOP_Y_POSITION = 320
 EXAMPLES_DIR = "./examples/"
 
 
-def process_image(image: np.ndarray) -> np.ndarray:
+def annotate_lanes(image: np.ndarray) -> np.ndarray:
+    """ Returns a copy of the input image with lanes annotated. """
     first_img = np.copy(image)
     height, width, _ = first_img.shape
 
-    lines = find_lines(first_img)
-    lanes = reduce_to_lanes(lines)
+    lines = _find_lines(first_img)
+    lanes = _reduce_to_lanes(lines)
 
     # draw from the bottom of the image to near the horizon
     lanes = [extrapolate(lane, height, LANE_TOP_Y_POSITION) for lane in lanes]
@@ -43,11 +45,23 @@ def process_image(image: np.ndarray) -> np.ndarray:
     return weighted_img(lines_img, first_img, .9)
 
 
-def find_lines(image: np.ndarray) -> Sequence[Line]:
+def find_lanes(image: np.ndarray) -> Sequence[Line]:
+    """ Returns a list of Line objects corresponding to lanes. """
+    first_img = np.copy(image)
+    height, width, _ = first_img.shape
+
+    lines = _find_lines(first_img)
+    lanes = _reduce_to_lanes(lines)
+
+    # draw from the bottom of the image to near the horizon
+    return [extrapolate(lane, height, LANE_TOP_Y_POSITION) for lane in lanes]
+
+
+def _find_lines(image: np.ndarray) -> Sequence[Line]:
     height, width, _ = image.shape
     gray = grayscale(image)
     # cv2.imwrite(EXAMPLES_DIR + "gray.jpg", gray)
-    vertices = region_of_interest_vertices(height, width)
+    vertices = _region_of_interest_vertices(height, width)
     region = region_of_interest(gray, [vertices])  # HMM, how do we get rid of the lines from our region selection
     # cv2.imwrite(EXAMPLES_DIR + "region_selected.jpg", region)
     blurred = gaussian_blur(region, GAUSSIAN_BLUR_KERNEL_SIZE)  # maybe we can filter all non lanes by raising blur
@@ -55,14 +69,14 @@ def find_lines(image: np.ndarray) -> Sequence[Line]:
     canny_img = canny(blurred, LOW_CANNY_THRESHOLD, HIGH_CANNY_THRESHOLD)
     # cv2.imwrite(EXAMPLES_DIR + "canny.jpg", canny_img)
 
-    slightly_smaller_vertices = vertices_just_inside(vertices)
+    slightly_smaller_vertices = _vertices_just_inside(vertices)
     # cv2.imwrite(EXAMPLES_DIR + "canny.jpg", slightly_smaller_vertices)
     cropped_canny = region_of_interest(canny_img, [slightly_smaller_vertices])
 
     return hough_lines(cropped_canny, RHO, THETA, HOUGH_LINE_THRESHOLD, MIN_LINE_LEN, MAX_LINE_GAP)
 
 
-def reduce_to_lanes(lines: Sequence[Line]) -> Sequence[Line]:
+def _reduce_to_lanes(lines: Sequence[Line]) -> Sequence[Line]:
     """ Heuristically reduce a list of lines to what we believe are lanes. """
 
     # filter lines that are too high to be lane lines
@@ -78,7 +92,7 @@ def reduce_to_lanes(lines: Sequence[Line]) -> Sequence[Line]:
     return left_avg + right_avg
 
 
-def region_of_interest_vertices(height: int, width: int) -> np.array:
+def _region_of_interest_vertices(height: int, width: int) -> np.array:
     """ Create a region of interest by connecting a specified point to the two bottom corners of the img """
     pinch = 10
     top_vertex_y = int(TOP_VERTEX_HEIGHT_PERCENT * height)
@@ -86,7 +100,7 @@ def region_of_interest_vertices(height: int, width: int) -> np.array:
     return np.array([(pinch, height), (top_vertex_x, top_vertex_y), (width - pinch, height)])
 
 
-def vertices_just_inside(region: np.array) -> np.array:
+def _vertices_just_inside(region: np.array) -> np.array:
     """ Returns a region just inside a given region. Regions are represented by a 3 element np.array of tuples. """
     delta_pixels = 70
     bottom_left, top, bottom_right = region
@@ -96,6 +110,6 @@ def vertices_just_inside(region: np.array) -> np.array:
     return np.array([inner_bottom_left, inner_top, inner_bottom_right])
 
 
-def write_image(path, img):
+def _write_image(path, img):
     img_out = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     cv2.imwrite(path, img_out)
