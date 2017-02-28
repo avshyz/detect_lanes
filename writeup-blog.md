@@ -9,13 +9,11 @@ The goal of the project was to detect lane lines on overhead camera video footag
 [canny]: ./examples/canny.jpg
 [lines]: ./examples/lines.jpg
 [final]: ./test_images/solidWhiteCurve_annotated.jpg
-[video]: ./white.mp4 "video"
+[compare]: ./self_driving_car_begin_end.png
 
-Basically, to turn: [unprocessed video] into [processed video]
+Basically, to turn the left image into the right image.
 
-![video][video]
-
-
+![compare][compare]
 
 In this post we'll go over what learned for people who are interested in Computer Vision or people hoping to
 get a glimpse into the Self Driving Car Nano Degree.
@@ -31,7 +29,7 @@ and the second is heuristically removing lines that don't seem like sensible can
 [image of pipeline]
 
 * Generate Candidate Lines
-  * convert image to grayscale
+  * Convert Image to Grayscale
   * choose a region of interest
   * apply gaussian blur
   * apply the canny transform
