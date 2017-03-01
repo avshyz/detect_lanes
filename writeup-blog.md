@@ -13,9 +13,9 @@ The goal of the project was to detect lane lines on overhead camera video footag
 
 Basically, a tool to turn the left video into the right one:
 
-<iframe src="//giphy.com/embed/3oKIPDOxc9XKGqh2O4" width="480" height="270" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/lanedetection-computervision-programming-selfdrivingcars-3oKIPDOxc9XKGqh2O4">via GIPHY</a></p>
+![Compare](https://media.giphy.com/media/3oKIPDOxc9XKGqh2O4/giphy.gif)
 
-![compare][compare]
+<!-- ![compare][compare] -->
 
 In this post we'll go over what learned for people who are interested in Computer Vision or people hoping to
 get a glimpse into the Self Driving Car Nano Degree.
