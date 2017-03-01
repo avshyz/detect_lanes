@@ -2,6 +2,7 @@
 I recently built a [lane detection tool]() for the first project of the [Self Driving Car Nano Degree](https://www.udacity.com/drive) program through Udacity.
 The goal of the project was to detect lane lines on overhead camera video footage taken while a person was driving.
 
+[//]: # (Image References)
 [image1]: ./examples/grayscale.jpg "Grayscale"
 [gray]: ./examples/gray.jpg "gray"
 [region of interest]: ./examples/region_selected.jpg "hello"
@@ -15,7 +16,7 @@ Basically, a tool to turn the left video into the right one:
 
 ![Compare](https://media.giphy.com/media/3oKIPDOxc9XKGqh2O4/giphy.gif)
 
-<!-- ![compare][compare] -->
+![compare][compare]
 
 In this post we'll go over what learned for people who are interested in Computer Vision or people hoping to
 get a glimpse into the Self Driving Car Nano Degree.
@@ -31,18 +32,13 @@ and the second is heuristically removing lines that don't seem like sensible can
 [image of pipeline]
 
 * Generate Candidate Lines
-  * Convert Image to Grayscale
-  * choose a region of interest
-  * apply gaussian blur
-  * apply the canny transform
-  * detect lines by converting image to hough space
+  * [Convert Image to Grayscale](#Convert Image to Grayscale)
+  * [Choose a Region of Interest](#Choose a Region Of Interest)
+  * Apply Gaussian Blur
+  * Apply the Canny Transform
+  * Detect Lines by Converting Image to Hough Space
 
 * Filtering / combining / processing lines to creating reasonable lane candidates
-
-
-[//]: # (Image References)
-
-
 
 ### Generate Candidate Lines
 
