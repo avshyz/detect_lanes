@@ -16,8 +16,6 @@ Basically, a tool to turn the left video into the right one:
 
 ![Compare](https://media.giphy.com/media/3oKIPDOxc9XKGqh2O4/giphy.gif)
 
-![compare][compare]
-
 In this post we'll go over what learned for people who are interested in Computer Vision or people hoping to
 get a glimpse into the Self Driving Car Nano Degree.
 I'll follow this post up with a post on my general impressions on the program after the first two weeks.
@@ -31,14 +29,13 @@ and the second is heuristically removing lines that don't seem like sensible can
 
 [image of pipeline]
 
-* Generate Candidate Lines
+* [Generate Candidate Lines](#generate-candidate-lines)
   * [Convert Image to Grayscale](#convert-image-to-grayscale)
   * [Choose a Region of Interest](#choose-a-region-of-interest)
-  * Apply Gaussian Blur
-  * Apply the Canny Transform
-  * Detect Lines by Converting Image to Hough Space
-
-* Filtering / combining / processing lines to creating reasonable lane candidates
+  * [Apply Gaussian Blur](#apply-gaussian-blut)
+  * [Apply the Canny Transform](#canny-transform)
+  * [Detect Lines by Converting Image to Hough Space](#detect-lines)
+* [Heuristically Process Lines](#heuristically-process-lines)
 
 ### Generate Candidate Lines
 
@@ -108,7 +105,7 @@ Convert our image to Hough Space. We try to draw lines along edges in our image 
 
 (1) I made my own line data structure to make working with the lines friendlier
 
-#### Heuristically process lines (`reduce_to_lanes`)
+#### Heuristically Process Lines (`reduce_to_lanes`)
 Now that we have all of our lines to work with. We can use logic to guess what we think are the lane lines. We'll do things like:
   * Remove lines that have too small a magnitude of slope. These lines will be too horizontal for us.
   * Remove lines that are too high up in the image. These are the sky or other non lane lines stuff.
