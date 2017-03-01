@@ -32,8 +32,8 @@ and the second is heuristically removing lines that don't seem like sensible can
 [image of pipeline]
 
 * Generate Candidate Lines
-  * [Convert Image to Grayscale](#Convert Image to Grayscale)
-  * [Choose a Region of Interest](#Choose a Region Of Interest)
+  * [Convert Image to Grayscale](#convert-image-to-grayscale)
+  * [Choose a Region of Interest](#choose-a-region-of-interest)
   * Apply Gaussian Blur
   * Apply the Canny Transform
   * Detect Lines by Converting Image to Hough Space
