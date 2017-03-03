@@ -1,7 +1,10 @@
+import argparse
 from typing import Sequence
 
 import cv2
+import matplotlib.image as mpimg
 import numpy as np
+import os
 
 from image_processing import grayscale, region_of_interest, gaussian_blur, canny, hough_lines, weighted_img, \
     make_lines_image
@@ -26,7 +29,34 @@ MIN_SLOPE = .4
 
 LANE_TOP_Y_POSITION = 320
 
-EXAMPLES_DIR = "./examples/"
+PIPELINE_EXAMPLES = "./pipeline_examples/"
+
+
+def main():
+    parser = argparse.ArgumentParser(description="annotate lane lines on an image of a road.")
+    parser.add_argument("src_path", help="The path of the source image you would like annotated.")
+    parser.add_argument("dest_path", help="where you'd like us to leave your nice annotated image.")
+    args = parser.parse_args()
+    annotate_lanes_file(args.src_path, args.dest_path)
+    print("Annotated file:", args.src_path, "and left it at:", args.dest_path, "Drive safe!")
+
+
+def annotate_lanes_batch(source_dir: str, dest_dir: str) -> None:
+    """ Annotate a directory filled with images """
+    image_path_endings = os.listdir(source_dir)
+    source_paths = (os.path.join(source_dir, ending) for ending in image_path_endings)
+    dest_paths = (os.path.join(dest_dir, ending) for ending in image_path_endings)
+
+    for (source, dest) in zip(source_paths, dest_paths):
+        annotate_lanes_file(source, dest)
+
+
+def annotate_lanes_file(source_file_path: str, dest_file_path: str) -> None:
+    image = mpimg.imread(source_file_path)
+    image_copy = np.copy(image)
+    with_lane_highlights = annotate_lanes(image_copy)
+    cv2.imwrite(dest_file_path, with_lane_highlights)
+    # _write_image(dest_file_path, with_lane_highlights)
 
 
 def annotate_lanes(image: np.ndarray) -> np.ndarray:
@@ -58,16 +88,19 @@ def find_lanes(image: np.ndarray) -> Sequence[Line]:
 
 
 def _find_lines(image: np.ndarray) -> Sequence[Line]:
+    PIPELINE_EXAMPLES = "./pipeline_examples/"
     height, width, _ = image.shape
     gray = grayscale(image)
-    # cv2.imwrite(EXAMPLES_DIR + "gray.jpg", gray)
+    cv2.imwrite(PIPELINE_EXAMPLES + "gray.jpg", gray)
     vertices = _region_of_interest_vertices(height, width)
     region = region_of_interest(gray, [vertices])  # HMM, how do we get rid of the lines from our region selection
-    # cv2.imwrite(EXAMPLES_DIR + "region_selected.jpg", region)
+    cv2.imwrite(PIPELINE_EXAMPLES + "region_selected.jpg", region)
     blurred = gaussian_blur(region, GAUSSIAN_BLUR_KERNEL_SIZE)  # maybe we can filter all non lanes by raising blur
-    # cv2.imwrite(EXAMPLES_DIR + "blurred.jpg", blurred)
+    cv2.imwrite(PIPELINE_EXAMPLES + "blurred.jpg", blurred)
     canny_img = canny(blurred, LOW_CANNY_THRESHOLD, HIGH_CANNY_THRESHOLD)
-    # cv2.imwrite(EXAMPLES_DIR + "canny.jpg", canny_img)
+    print("writing canny2")
+    # img_out = cv2.cvtColor(canny_img, cv2.COLOR_BGR2RGB)
+    cv2.imwrite(PIPELINE_EXAMPLES + "canny2.jpg", canny_img)
 
     slightly_smaller_vertices = _vertices_just_inside(vertices)
     # cv2.imwrite(EXAMPLES_DIR + "canny.jpg", slightly_smaller_vertices)
@@ -110,6 +143,5 @@ def _vertices_just_inside(region: np.array) -> np.array:
     return np.array([inner_bottom_left, inner_top, inner_bottom_right])
 
 
-def _write_image(path, img):
-    img_out = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    cv2.imwrite(path, img_out)
+if __name__ == '__main__':
+    main()

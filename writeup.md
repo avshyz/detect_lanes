@@ -87,4 +87,6 @@ Another shortcoming could be ...
 This would smooth results and remove jumpiness. Also if you lose your lane for a frame it will handle it in a sensible way.
 * Improve parameter tuning or calibrate parameters around certain features of the image.
 Perhaps calibrate region of interest on previously seen lane lines. Try to use the horizon, etc.
+* Train a ML classification model to predict if a line is a good lane candidate.
+* Try to fit curved lines for curved roads.
 
