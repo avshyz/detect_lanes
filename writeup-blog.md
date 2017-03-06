@@ -4,11 +4,12 @@ The goal of the project was to detect lane lines on overhead camera video footag
 
 [//]: # (Image References)
 [whole pipeline]: ./pipeline_example/LaneDetectionPipeline.png
-[gray]: ./examples/gray.jpg "gray"
-[region of interest]: ./examples/region_selected.jpg "hello"
-[blurred]: ./examples/blurred.jpg
-[canny]: ./examples/canny.jpg
-[lines]: ./examples/lines.jpg
+[gray]: ./pipeline_examples/gray.jpg "gray"
+[region of interest]: ./pipeline_examples/region_selected.jpg "hello"
+[blurred]: ./pipeline_examples/blurred.jpg
+[canny]: ./pipeline_examples/canny.jpg
+[all_lines]: ./pipeline_examples/all_lines.jpg
+[lines]: ./pipeline_examples/lines.jpg
 [final]: ./test_images/solidWhiteCurve_annotated.jpg
 [compare]: ./self_driving_car_begin_end.png
 
@@ -104,6 +105,8 @@ Convert our image to Hough Space. We try to draw lines along edges in our image 
     lines = [Line(*line[0]) for line in lines]         # (1)
 
 (1) I made my own line data structure to make working with the lines friendlier
+
+![All the lines][all_lines]
 
 #### Heuristically Process Lines (`reduce_to_lanes`)
 Now that we have all of our lines to work with. We can use logic to guess what we think are the lane lines. We'll do things like:
