@@ -3,7 +3,7 @@ I recently built a [lane detection tool]() for the first project of the [Self Dr
 The goal of the project was to detect lane lines on overhead camera video footage taken while a person was driving.
 
 [//]: # (Image References)
-[image1]: ./examples/grayscale.jpg "Grayscale"
+[whole pipeline]: ./pipeline_example/LaneDetectionPipeline.png
 [gray]: ./examples/gray.jpg "gray"
 [region of interest]: ./examples/region_selected.jpg "hello"
 [blurred]: ./examples/blurred.jpg
@@ -27,7 +27,7 @@ edge detection and logic.
 The pipeline has two major phases: the first is prepping for and detecting lines in the image,
 and the second is heuristically removing lines that don't seem like sensible candidates to represent lanes.
 
-[image of pipeline]
+![whole pipeline]
 
 * [Generate Candidate Lines](#generate-candidate-lines)
   * [Convert Image to Grayscale](#convert-image-to-grayscale)
