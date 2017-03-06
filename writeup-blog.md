@@ -4,13 +4,13 @@ The goal of the project was to detect lane lines on overhead camera video footag
 
 [//]: # (Image References)
 [whole pipeline]: ./pipeline_example/LaneDetectionPipeline.png
-[gray]: ./pipeline_examples/gray.jpg "gray"
-[region of interest]: ./pipeline_examples/region_selected.jpg "hello"
-[blurred]: ./pipeline_examples/blurred.jpg
-[canny]: ./pipeline_examples/canny.jpg
-[all_lines]: ./pipeline_examples/all_lines.jpg
-[lines]: ./pipeline_examples/lines.jpg
-[final]: ./test_images/solidWhiteCurve_annotated.jpg
+[gray]: ./pipeline_example/gray.jpg "gray"
+[region of interest]: ./pipeline_example/region_selected.jpg "hello"
+[blurred]: ./pipeline_example/blurred.jpg
+[canny]: ./pipeline_example/canny.jpg
+[all_lines]: ./pipeline_example/all_lines.jpg
+[lines]: ./pipeline_example/lines.jpg
+[final]: ./test_images_output/solidWhiteCurve.jpg
 [compare]: ./self_driving_car_begin_end.png
 
 Basically, a tool to turn the left video into the right one:
