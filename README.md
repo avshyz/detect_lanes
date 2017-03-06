@@ -2,6 +2,8 @@
 [![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
 Easily identify lane lines in driving data.
 
+![Compare](https://media.giphy.com/media/3oKIPDOxc9XKGqh2O4/giphy.gif)
+
 ## Usage
 
 #### Command Line:
