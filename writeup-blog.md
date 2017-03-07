@@ -135,7 +135,7 @@ Now we can make an image to represent our lines and glue it to our copy of the o
 
 ### Conclusion
 We just stepped through a practical image processing pipeline using opencv and python! It goes without saying,
-this is not production ready, but it's exciting to see how much we can do with a little image manipulating and line
+this is not road ready, but it's exciting to see how much we can do with a little image manipulating and line
 filtering logic. What a nice starting point. Next, we'll talk about the experience of going through the first two weeks of the Udacity Self Driving Car Nanodegree.
 
 #### Shortcomings

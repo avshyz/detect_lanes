@@ -55,8 +55,8 @@ def annotate_lanes_file(source_file_path: str, dest_file_path: str) -> None:
     image = mpimg.imread(source_file_path)
     image_copy = np.copy(image)
     with_lane_highlights = annotate_lanes(image_copy)
-    cv2.imwrite(dest_file_path, with_lane_highlights)
-    # _write_image(dest_file_path, with_lane_highlights)
+    # cv2.imwrite(dest_file_path, with_lane_highlights)
+    _write_color_image(dest_file_path, with_lane_highlights)
 
 
 def annotate_lanes(image: np.ndarray) -> np.ndarray:
@@ -88,22 +88,14 @@ def find_lanes(image: np.ndarray) -> Sequence[Line]:
 
 
 def _find_lines(image: np.ndarray) -> Sequence[Line]:
-    PIPELINE_EXAMPLES = "./pipeline_examples/"
     height, width, _ = image.shape
     gray = grayscale(image)
-    cv2.imwrite(PIPELINE_EXAMPLES + "gray.jpg", gray)
     vertices = _region_of_interest_vertices(height, width)
     region = region_of_interest(gray, [vertices])  # HMM, how do we get rid of the lines from our region selection
-    cv2.imwrite(PIPELINE_EXAMPLES + "region_selected.jpg", region)
     blurred = gaussian_blur(region, GAUSSIAN_BLUR_KERNEL_SIZE)  # maybe we can filter all non lanes by raising blur
-    cv2.imwrite(PIPELINE_EXAMPLES + "blurred.jpg", blurred)
     canny_img = canny(blurred, LOW_CANNY_THRESHOLD, HIGH_CANNY_THRESHOLD)
-    print("writing canny2")
-    # img_out = cv2.cvtColor(canny_img, cv2.COLOR_BGR2RGB)
-    cv2.imwrite(PIPELINE_EXAMPLES + "canny2.jpg", canny_img)
 
     slightly_smaller_vertices = _vertices_just_inside(vertices)
-    # cv2.imwrite(EXAMPLES_DIR + "canny.jpg", slightly_smaller_vertices)
     cropped_canny = region_of_interest(canny_img, [slightly_smaller_vertices])
 
     return hough_lines(cropped_canny, RHO, THETA, HOUGH_LINE_THRESHOLD, MIN_LINE_LEN, MAX_LINE_GAP)
@@ -141,6 +133,10 @@ def _vertices_just_inside(region: np.array) -> np.array:
     inner_top = (top[0], top[1] + int(delta_pixels / 10))
     inner_bottom_right = (bottom_right[0] - delta_pixels, bottom_right[1] - int(delta_pixels / 10))
     return np.array([inner_bottom_left, inner_top, inner_bottom_right])
+
+def _write_color_image(path, img):
+    img_out = cv2.cvtColor(img, cv2.COLOR_BGR2RGB);
+    cv2.imwrite(path, img_out)
 
 
 if __name__ == '__main__':

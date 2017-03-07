@@ -9,12 +9,8 @@ from line_math import Line
 def grayscale(img: np.ndarray):
     """Applies the Grayscale transform
     This will return an image with only one color channel
-    but NOTE: to see the returned image as grayscale
-    (assuming your grayscaled image is called 'gray')
-    you should call plt.imshow(gray, cmap='gray')"""
+    but NOTE: to see the returned image as grayscale"""
     return cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-    # Or use BGR2GRAY if you read an image with cv2.imread()
-    # return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 
 def canny(img, low_threshold, high_threshold):
@@ -67,12 +63,7 @@ def hough_lines(img, rho, theta, threshold, min_line_len, max_line_gap) -> Seque
 
 def weighted_img(img, initial_img, α=0.8, β=1., λ=0.):
     """
-    `img` is the output of the hough_lines(), An image with lines drawn on it.
-    Should be a blank image (all black) with lines drawn on it.
-
-    `initial_img` should be the image before any processing.
-
-    The result image is computed as follows:
+    Merge two images together
 
     initial_img * α + img * β + λ
     NOTE: initial_img and img must be the same shape!
